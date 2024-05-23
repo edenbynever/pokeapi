@@ -155,11 +155,18 @@ def scrub_str(string):
     return string
 
 
+BUILD_GROUPS = {}
+def build_group(fn):
+    group = fn.__name__[7:] # strip "_build_"
+    BUILD_GROUPS[group] = fn
+
+
 ##############
 #  LANGUAGE  #
 ##############
 
 
+@build_group
 def _build_languages():
     def csv_record_to_objects(info):
         yield Language(
@@ -186,6 +193,7 @@ def _build_languages():
 ############
 
 
+@build_group
 def _build_regions():
     def csv_record_to_objects(info):
         yield Region(id=int(info[0]), name=info[1])
@@ -203,6 +211,7 @@ def _build_regions():
 ################
 
 
+@build_group
 def _build_generations():
     def csv_record_to_objects(info):
         yield Generation(id=int(info[0]), region_id=int(info[1]), name=info[2])
@@ -222,6 +231,7 @@ def _build_generations():
 #############
 
 
+@build_group
 def _build_versions():
     def csv_record_to_objects(info):
         yield VersionGroup(
@@ -258,6 +268,7 @@ def _build_versions():
 ##################
 
 
+@build_group
 def _build_damage_classes():
     def csv_record_to_objects(info):
         yield MoveDamageClass(id=int(info[0]), name=info[1])
@@ -286,6 +297,7 @@ def _build_damage_classes():
 ###########
 
 
+@build_group
 def _build_stats():
     def csv_record_to_objects(info):
         yield Stat(
@@ -323,6 +335,7 @@ def _build_stats():
 # ###############
 
 
+@build_group
 def _build_abilities():
     def csv_record_to_objects(info):
         yield Ability(
@@ -387,6 +400,7 @@ def _build_abilities():
 ####################
 
 
+@build_group
 def _build_characteristics():
     def csv_record_to_objects(info):
         yield Characteristic(
@@ -412,6 +426,7 @@ def _build_characteristics():
 ###############
 
 
+@build_group
 def _build_egg_groups():
     def csv_record_to_objects(info):
         yield EggGroup(id=int(info[0]), name=info[1])
@@ -431,6 +446,7 @@ def _build_egg_groups():
 #################
 
 
+@build_group
 def _build_growth_rates():
     def csv_record_to_objects(info):
         yield GrowthRate(id=int(info[0]), name=info[1], formula=info[2])
@@ -452,6 +468,7 @@ def _build_growth_rates():
 # ###########
 
 
+@build_group
 def _build_items():
     def csv_record_to_objects(info):
         yield ItemPocket(id=int(info[0]), name=info[1])
@@ -587,6 +604,7 @@ def _build_items():
 ###########
 
 
+@build_group
 def _build_types():
     def csv_record_to_objects(info):
         yield Type(
@@ -635,6 +653,7 @@ def _build_types():
 #############
 
 
+@build_group
 def _build_contests():
     def csv_record_to_objects(info):
         yield ContestType(id=int(info[0]), name=info[1])
@@ -699,6 +718,7 @@ def _build_contests():
 ###########
 
 
+@build_group
 def _build_moves():
     def csv_record_to_objects(info):
         yield MoveEffect(id=int(info[0]))
@@ -968,6 +988,7 @@ def _build_moves():
 #############
 
 
+@build_group
 def _build_berries():
     def csv_record_to_objects(info):
         yield BerryFirmness(id=int(info[0]), name=info[1])
@@ -1037,6 +1058,7 @@ def _build_berries():
 ############
 
 
+@build_group
 def _build_natures():
     def csv_record_to_objects(info):
         decreased_stat = None
@@ -1098,6 +1120,7 @@ def _build_natures():
 ###########
 
 
+@build_group
 def _build_genders():
     def csv_record_to_objects(info):
         yield Gender(id=int(info[0]), name=info[1])
@@ -1110,6 +1133,7 @@ def _build_genders():
 ################
 
 
+@build_group
 def _build_experiences():
     def csv_record_to_objects(info):
         yield Experience(
@@ -1124,6 +1148,7 @@ def _build_experiences():
 ##############
 
 
+@build_group
 def _build_machines():
     def csv_record_to_objects(info):
         yield Machine(
@@ -1141,6 +1166,7 @@ def _build_machines():
 ###############
 
 
+@build_group
 def _build_evolutions():
     def csv_record_to_objects(info):
         yield EvolutionChain(
@@ -1170,6 +1196,7 @@ def _build_evolutions():
 #############
 
 
+@build_group
 def _build_pokedexes():
     def csv_record_to_objects(info):
         yield Pokedex(
@@ -1208,6 +1235,7 @@ def _build_pokedexes():
 ##############
 
 
+@build_group
 def _build_locations():
     def csv_record_to_objects(info):
         yield Location(
@@ -1264,6 +1292,7 @@ def _build_locations():
 #############
 
 
+@build_group
 def _build_pokemons():
     def csv_record_to_objects(info):
         yield PokemonColor(id=int(info[0]), name=info[1])
@@ -2197,6 +2226,7 @@ def _build_pokemons():
 ###############
 
 
+@build_group
 def _build_encounters():
     def csv_record_to_objects(info):
         yield EncounterMethod(id=int(info[0]), name=info[1], order=int(info[2]))
@@ -2312,6 +2342,7 @@ def _build_encounters():
 ##############
 
 
+@build_group
 def _build_pal_parks():
     def csv_record_to_objects(info):
         yield PalParkArea(id=int(info[0]), name=info[1])
@@ -2336,32 +2367,14 @@ def _build_pal_parks():
     build_generic((PalPark,), "pal_park.csv", csv_record_to_objects)
 
 
+def build(groups):
+    for group in groups.split():
+        BUILD_GROUPS[group]()
+
+
 def build_all():
-    _build_languages()
-    _build_regions()
-    _build_generations()
-    _build_versions()
-    _build_damage_classes()
-    _build_stats()
-    _build_abilities()
-    _build_characteristics()
-    _build_egg_groups()
-    _build_growth_rates()
-    _build_items()
-    _build_types()
-    _build_contests()
-    _build_moves()
-    _build_berries()
-    _build_natures()
-    _build_genders()
-    _build_experiences()
-    _build_machines()
-    _build_evolutions()
-    _build_pokedexes()
-    _build_locations()
-    _build_pokemons()
-    _build_encounters()
-    _build_pal_parks()
+    for builder in BUILD_GROUPS.values():
+        builder()
 
 
 if __name__ == "__main__":

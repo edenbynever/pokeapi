@@ -21,6 +21,14 @@ setup:  # Set up the project database
 build-db:  # Build database
 	echo "from data.v2.build import build_all; build_all()" | python manage.py shell ${local_config}
 
+ifeq (build-groups,$(firstword $(MAKECMDGOALS)))
+  ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(ARGS):;@:)
+endif
+
+build-groups:  # Build select table groups
+	python manage.py shell ${local_config} -c "from data.v2.build import build; build('$(ARGS)')"
+
 wipe-sqlite-db:  # Delete's the project database
 	rm -rf db.sqlite3
 
